@@ -6,12 +6,17 @@ async function main() {
     "app"
   );
 
+  // create a new record
+  const tableName = "person";
+  const fristName = "Candle";
+  const lastName = "Mic";
+  const age = 30;
   const result = await runner.query(
-    "mutation{ createPerson( input: { person:{ firstName:\"Dee\", lastName:\"Henz\", age:40}}) { person {id}}}"
+    "mutation{ createPerson( input: { person:{ firstName:"+ JSON.stringify(fristName) + 
+    ", lastName:"+ JSON.stringify(lastName) +", age:" + age + "}}) { "+ tableName +" {id}}}"
   );
 
   console.log(JSON.stringify(result, null, 2));
-
   await runner.release();
 }
 

@@ -1,9 +1,6 @@
 const { Pool } = require("pg");
 const { graphql } = require("graphql");
-const {
-  withPostGraphileContext,
-  createPostGraphileSchema,
-} = require("postgraphile");
+const { withPostGraphileContext, createPostGraphileSchema,} = require("postgraphile");
 
 async function makeQueryRunner( connectionString, schemaName,options = {}) {
   // Create the PostGraphile schema 
@@ -25,17 +22,17 @@ async function makeQueryRunner( connectionString, schemaName,options = {}) {
     jwtToken = null, // A string, or null
     operationName = null
   ) => {
-    // Whatever you need to appease your pgSettings function, if you have one, should be put in here.
-    const fakeRequest = { headers: {} };
+
+    const request = { headers: {} };
 
     // pgSettings and additionalContextFromRequest cannot be functions at this point
     const pgSettings =
       typeof options.pgSettings === "function"
-        ? options.pgSettings(fakeRequest)
+        ? options.pgSettings(request)
         : options.pgSettings;
     const additionalContextFromRequest =
       typeof options.additionalContextFromRequest === "function"
-        ? options.additionalContextFromRequest(fakeRequest)
+        ? options.additionalContextFromRequest(request)
         : options.additionalContextFromRequest;
 
     return await withPostGraphileContext(
@@ -46,7 +43,6 @@ async function makeQueryRunner( connectionString, schemaName,options = {}) {
         pgSettings,
       },
       async (context) => {
-        // Do NOT use context outside of this function.
         return await graphql(
           schema,
           graphqlQuery,
@@ -54,7 +50,6 @@ async function makeQueryRunner( connectionString, schemaName,options = {}) {
           {
             ...context,
             ...additionalContextFromRequest,
-            /* You can add more to context if you like */
           },
           variables,
           operationName
